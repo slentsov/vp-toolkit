@@ -19,7 +19,7 @@ export declare class VerifiablePresentationGenerator {
      * @param {IVerifiablePresentation} params the proof will be overwritten!
      * @param {{accountId: number, keyId: number}[]} keys used to prove ownership over each VC inside
      * @param {string|undefined} correspondenceId optional value to use as proof.nonce field
-     * @return ChallengeRequest
+     * @return VerifiablePresentation
      */
     generateVerifiablePresentation(params: IVerifiablePresentation, keys: {
         accountId: number;
