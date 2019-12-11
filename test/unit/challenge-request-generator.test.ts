@@ -71,6 +71,7 @@ describe('challenge request generator', function () {
         { predicate: 'https://schema.org/givenName' },
         { predicate: 'https://schema.org/familyName' }
       ],
+      postEndpoint: 'https://endpoint.com/something',
       toVerify: [
         { predicate: 'https://schema.org/initials' }
       ],
@@ -87,7 +88,7 @@ describe('challenge request generator', function () {
     // Asserting whether the result is as expected
     const resultString = JSON.stringify(result)
     const obj = JSON.parse(resultString)
-    assert.deepEqual(resultString, `{"toAttest":[{"predicate":"https://schema.org/givenName"},{"predicate":"https://schema.org/familyName"}],"toVerify":[{"predicate":"https://schema.org/initials"}],"correspondenceId":"${obj.correspondenceId}","proof":{"type":"SignatureType2019","created":"2019-01-01T23:34:56.000Z","verificationMethod":"pubkey","nonce":"${obj.proof.nonce}","signatureValue":"testSignatureValue"}}`)
+    assert.deepEqual(resultString, `{"toAttest":[{"predicate":"https://schema.org/givenName"},{"predicate":"https://schema.org/familyName"}],"postEndpoint":"https://endpoint.com/something","toVerify":[{"predicate":"https://schema.org/initials"}],"correspondenceId":"${obj.correspondenceId}","proof":{"type":"SignatureType2019","created":"2019-01-01T23:34:56.000Z","verificationMethod":"pubkey","nonce":"${obj.proof.nonce}","signatureValue":"testSignatureValue"}}`)
     result.proof.created.should.have.been.equal(clock.Date().toISOString())
     // Asserting whether cryptUtil has been called properly to determine the verificationMethod
     cryptUtilStub.should.have.been.calledOnceWithExactly(0, 0)

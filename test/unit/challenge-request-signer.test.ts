@@ -64,6 +64,7 @@ describe('challenge request signer', function () {
   it('should call cryptutil, for the sign method, with the correct params', () => {
     const challengeRequest = new ChallengeRequest({
       toAttest: [{ predicate: 'https://schema.org/familyName' }],
+      postEndpoint: 'https://endpoint.com/something',
       toVerify: [{ predicate: 'https://schema.org/initials' }],
       proof: testProof
     })
@@ -79,6 +80,7 @@ describe('challenge request signer', function () {
   it('should call cryptutil, for the verify method, with the correct params', () => {
     const challengeRequest = new ChallengeRequest({
       toAttest: [{ predicate: 'https://schema.org/familyName' }],
+      postEndpoint: 'https://endpoint.com/something',
       toVerify: [{ predicate: 'https://schema.org/initials' }],
       proof: testProof
     })
@@ -96,6 +98,7 @@ describe('challenge request signer', function () {
   it('should fail verification if cryptutil returns false', () => {
     const challengeRequest = new ChallengeRequest({
       toAttest: [{ predicate: 'https://schema.org/familyName' }],
+      postEndpoint: 'https://endpoint.com/something',
       toVerify: [{ predicate: 'https://schema.org/initials' }],
       proof: testProof
     })

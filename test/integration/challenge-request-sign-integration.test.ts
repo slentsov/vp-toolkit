@@ -35,6 +35,7 @@ const testProof: IProofParams = {
 const challengeRequest = new ChallengeRequest({
   toAttest: [{ predicate: 'https://schema.org/familyName' }],
   toVerify: [{ predicate: 'https://schema.org/initials' }],
+  postEndpoint: 'https://endpoint.com/something',
   proof: testProof,
   correspondenceId: '21a7133d-861b-4e30-aa52-14c21cc51ecc'
 })
@@ -48,7 +49,7 @@ describe('Integration: challenge request signer', function () {
     const cryptUtil = new LocalCryptUtils()
     cryptUtil.importMasterPrivateKey(privKey)
     const sut = new ChallengeRequestSigner(cryptUtil)
-    const expectedSignature = 'a382d709f653fceac4be4e8d3f56f863ab7ec6e6e89afcaaf862a1dd8c1647850f451f2612505b9ee4ba4092b04c2e1ebedc479c43e05fb97a93b7bb53c4599a'
+    const expectedSignature = '632cd48ec2951f423d32fefd9749d9495e09737b8dd6ee6224fb61353a7175da4f9e32a6f04e2e002ca570503d7ee37211d71edf431c4b230d87fe912e67dde7'
 
     const signature = sut.signChallengeRequest(challengeRequest, accountId, keyId)
 
@@ -63,6 +64,7 @@ describe('Integration: challenge request signer', function () {
     const crObject = new ChallengeRequest({
       toAttest: [{ predicate: 'https://schema.org/familyName' }],
       toVerify: [{ predicate: 'https://schema.org/initials' }],
+      postEndpoint: 'https://endpoint.com/something',
       proof: {
         type: 'Secp256k1Signature2019',
         created: new Date('01-01-2019 12:34:00'),
