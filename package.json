@@ -74,6 +74,6 @@
     "class-transformer": "^0.2.0",
     "crypt-util": "^0.1.1",
     "uuid": "^3.3.2",
-    "vp-toolkit-models": "github:rabobank-blockchain/vp-toolkit-models#develop"
+    "vp-toolkit-models": "github:rabobank-blockchain/vp-toolkit-models#5dd09eea5109dad2beaac29af8c0a5adda282bdd"
   }
 }
