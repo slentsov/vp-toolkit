@@ -62,9 +62,22 @@ export class VerifiableCredentialSigner {
     const publicKey = model.proof.verificationMethod
     const signature = model.proof.signatureValue as string
     modelWithoutSignatureValue.proof.signatureValue = undefined // Removed the SignatureValue because that field was also empty when signing the payload
-    const issuerDid = 'did:eth:0x' + keccak256(Buffer.from(publicKey, 'hex')).slice(-40)
+    const issuerDid = 'did:eth:' + this.toChecksumAddress(keccak256(Buffer.from(publicKey, 'hex')).slice(-40))
     const payload = JSON.stringify(modelWithoutSignatureValue)
 
     return issuerDid === model.issuer && this._cryptUtil.verifyPayload(payload, publicKey, signature)
+  }
+
+  private toChecksumAddress(address: string): string {
+    const hash = keccak256(address)
+    let ret = '0x'
+    for (let i = 0; i < address.length; i++) {
+      if (parseInt(hash[i], 16) >= 8) {
+        ret += address[i].toUpperCase()
+      } else {
+        ret += address[i]
+      }
+    }
+    return ret
   }
 }

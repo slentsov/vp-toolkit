@@ -25,4 +25,5 @@ export declare class VerifiableCredentialSigner {
      * @return boolean
      */
     verifyVerifiableCredential(model: VerifiableCredential): boolean;
+    private toChecksumAddress;
 }
