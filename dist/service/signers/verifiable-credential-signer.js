@@ -17,6 +17,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const vp_toolkit_models_1 = require("vp-toolkit-models");
+const js_sha3_1 = require("js-sha3");
 class VerifiableCredentialSigner {
     constructor(_cryptUtil) {
         this._cryptUtil = _cryptUtil;
@@ -55,8 +56,9 @@ class VerifiableCredentialSigner {
         const publicKey = model.proof.verificationMethod;
         const signature = model.proof.signatureValue;
         modelWithoutSignatureValue.proof.signatureValue = undefined; // Removed the SignatureValue because that field was also empty when signing the payload
+        const issuerDid = 'did:eth:0x' + js_sha3_1.keccak256(Buffer.from(publicKey, 'hex')).slice(-40);
         const payload = JSON.stringify(modelWithoutSignatureValue);
-        return this._cryptUtil.verifyPayload(payload, publicKey, signature);
+        return issuerDid === model.issuer && this._cryptUtil.verifyPayload(payload, publicKey, signature);
     }
 }
 exports.VerifiableCredentialSigner = VerifiableCredentialSigner;

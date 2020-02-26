@@ -18,6 +18,8 @@
 import { IVerifiableCredentialParams, VerifiableCredential } from 'vp-toolkit-models'
 import { CryptUtil } from 'crypt-util'
 
+import { keccak256 } from 'js-sha3';
+
 export class VerifiableCredentialSigner {
 
   constructor (private _cryptUtil: CryptUtil) {
@@ -60,8 +62,9 @@ export class VerifiableCredentialSigner {
     const publicKey = model.proof.verificationMethod
     const signature = model.proof.signatureValue as string
     modelWithoutSignatureValue.proof.signatureValue = undefined // Removed the SignatureValue because that field was also empty when signing the payload
+    const issuerDid = 'did:eth:0x' + keccak256(Buffer.from(publicKey, 'hex')).slice(-40)
     const payload = JSON.stringify(modelWithoutSignatureValue)
 
-    return this._cryptUtil.verifyPayload(payload, publicKey, signature)
+    return issuerDid === model.issuer && this._cryptUtil.verifyPayload(payload, publicKey, signature)
   }
 }

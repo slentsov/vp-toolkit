@@ -73,6 +73,8 @@
   "dependencies": {
     "class-transformer": "^0.2.0",
     "crypt-util": "^0.1.1",
+    "js-sha3": "^0.8.0",
+    "keccak256": "^1.0.0",
     "uuid": "^3.3.2",
     "vp-toolkit-models": "github:rabobank-blockchain/vp-toolkit-models#5dd09eea5109dad2beaac29af8c0a5adda282bdd"
   }
