@@ -19,6 +19,7 @@ import { IProofParams, IVerifiablePresentationParams, VerifiablePresentation } f
 import { CryptUtil } from 'crypt-util'
 import { v4 as uuid } from 'uuid'
 import { VerifiableCredentialSigner } from './verifiable-credential-signer'
+import {keccak256} from 'js-sha3';
 
 export class VerifiablePresentationSigner {
 
@@ -113,6 +114,14 @@ export class VerifiablePresentationSigner {
         if (this._cryptUtil.verifyPayload(payloadToVerifiy, vpProof.verificationMethod, ownershipSignature)
           && (correspondenceId === undefined || vpProof.nonce === correspondenceId)) {
           ownershipIsValid = true
+
+          // Check credential (for verification only) was signed by the same party that issued a document
+          if (!Object.keys(vc.credentialSubject).includes('predicate')) {
+            const didFromVerificationMethod = 'did:eth:' + this.toChecksumAddress(keccak256(Buffer.from(vpProof.verificationMethod, 'hex')).slice(-40))
+            if (didFromVerificationMethod !== vc.credentialSubject.id) {
+              return false
+            }
+          }
           break
         }
       }
@@ -123,5 +132,18 @@ export class VerifiablePresentationSigner {
     }
 
     return true
+  }
+
+  private toChecksumAddress (address: string): string {
+    const hash = keccak256(address)
+    let ret = '0x'
+    for (let i = 0; i < address.length; i++) {
+      if (parseInt(hash[i], 16) >= 8) {
+        ret += address[i].toUpperCase()
+      } else {
+        ret += address[i]
+      }
+    }
+    return ret
   }
 }

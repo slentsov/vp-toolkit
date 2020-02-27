@@ -44,4 +44,5 @@ export declare class VerifiablePresentationSigner {
      * @return boolean
      */
     verifyVerifiablePresentation(model: VerifiablePresentation, skipOwnershipValidation?: boolean, correspondenceId?: string): boolean;
+    private toChecksumAddress;
 }

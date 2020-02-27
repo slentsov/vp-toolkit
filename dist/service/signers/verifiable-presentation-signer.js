@@ -17,6 +17,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = require("uuid");
+const js_sha3_1 = require("js-sha3");
 class VerifiablePresentationSigner {
     constructor(_cryptUtil, _verifiableCredentialSigner) {
         this._cryptUtil = _cryptUtil;
@@ -103,6 +104,13 @@ class VerifiablePresentationSigner {
                 if (this._cryptUtil.verifyPayload(payloadToVerifiy, vpProof.verificationMethod, ownershipSignature)
                     && (correspondenceId === undefined || vpProof.nonce === correspondenceId)) {
                     ownershipIsValid = true;
+                    // Check credential (for verification only) was signed by the same party that issued a document
+                    if (!Object.keys(vc.credentialSubject).includes('predicate')) {
+                        const didFromVerificationMethod = 'did:eth:' + this.toChecksumAddress(js_sha3_1.keccak256(Buffer.from(vpProof.verificationMethod, 'hex')).slice(-40));
+                        if (didFromVerificationMethod !== vc.credentialSubject.id) {
+                            return false;
+                        }
+                    }
                     break;
                 }
             }
@@ -111,6 +119,19 @@ class VerifiablePresentationSigner {
             }
         }
         return true;
+    }
+    toChecksumAddress(address) {
+        const hash = js_sha3_1.keccak256(address);
+        let ret = '0x';
+        for (let i = 0; i < address.length; i++) {
+            if (parseInt(hash[i], 16) >= 8) {
+                ret += address[i].toUpperCase();
+            }
+            else {
+                ret += address[i];
+            }
+        }
+        return ret;
     }
 }
 exports.VerifiablePresentationSigner = VerifiablePresentationSigner;
