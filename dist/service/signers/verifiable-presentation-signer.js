@@ -17,7 +17,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = require("uuid");
-const js_sha3_1 = require("js-sha3");
 class VerifiablePresentationSigner {
     constructor(_cryptUtil, _verifiableCredentialSigner) {
         this._cryptUtil = _cryptUtil;
@@ -89,7 +88,6 @@ class VerifiablePresentationSigner {
      * @return boolean
      */
     verifyVerifiablePresentation(model, skipOwnershipValidation = false, correspondenceId) {
-        const proofsCopy = [...model.proof];
         for (const vc of model.verifiableCredential) {
             if (!this._verifiableCredentialSigner.verifyVerifiableCredential(vc)) {
                 return false;
@@ -97,47 +95,22 @@ class VerifiablePresentationSigner {
             if (skipOwnershipValidation) {
                 continue;
             }
-            const matchProof = this.matchAndRemove(proofsCopy, vc);
-            if (matchProof === null) {
-                return false;
-            }
             // Check credential ownership by looping through the VP proofs and find the matching proof
             let ownershipIsValid = false;
-            const ownershipSignature = matchProof.signatureValue;
-            const payloadToVerifiy = JSON.stringify(vc) + matchProof.nonce + matchProof.created;
-            if (this._cryptUtil.verifyPayload(payloadToVerifiy, matchProof.verificationMethod, ownershipSignature)
-                && (correspondenceId === undefined || matchProof.nonce === correspondenceId)) {
-                ownershipIsValid = true;
-                break;
+            for (const vpProof of model.proof) {
+                const ownershipSignature = vpProof.signatureValue;
+                const payloadToVerifiy = JSON.stringify(vc) + vpProof.nonce + vpProof.created;
+                if (this._cryptUtil.verifyPayload(payloadToVerifiy, vpProof.verificationMethod, ownershipSignature)
+                    && (correspondenceId === undefined || vpProof.nonce === correspondenceId)) {
+                    ownershipIsValid = true;
+                    break;
+                }
             }
             if (!ownershipIsValid) {
                 return false;
             }
         }
-        if (!skipOwnershipValidation && (proofsCopy.length !== 0)) {
-            return false;
-        }
         return true;
-    }
-    matchAndRemove(proofs, vc) {
-        const credentialDid = vc.credentialSubject.id;
-        const index = proofs.map(p => {
-            return 'did:eth:' + this.toChecksumAddress(js_sha3_1.keccak256(Buffer.from(p.verificationMethod, 'hex')).slice(-40));
-        }).indexOf(credentialDid);
-        return index === -1 ? null : proofs.splice(index, 1)[0];
-    }
-    toChecksumAddress(address) {
-        const hash = js_sha3_1.keccak256(address);
-        let ret = '0x';
-        for (let i = 0; i < address.length; i++) {
-            if (parseInt(hash[i], 16) >= 8) {
-                ret += address[i].toUpperCase();
-            }
-            else {
-                ret += address[i];
-            }
-        }
-        return ret;
     }
 }
 exports.VerifiablePresentationSigner = VerifiablePresentationSigner;
